@@ -14,3 +14,21 @@
 1417311052581	Rename method 'getAlbumStorageDirectory'
 1417369178105	Delete elements
 1417369671139	Delete element
+1417372137842	Rename resource 'place_badge_view.xml'
+1417372442728	Delete element
+1417372495578	Rename type 'PlaceRecord'
+1417372615358	Rename field 'mFlagBitmap'
+1417372641375	Rename type 'PlaceViewAdapter'
+1417373244796	Delete element
+1417373303415	Rename local variable 'curr'
+1417373452745	Rename resource 'activity_daily_selfie.xml'
+1417373894350	Rename resource 'daily_selfi_view.xml'
+1417377677197	Delete elements
+1417377679643	Delete element
+1417378899339	Rename local variable 'filename'
+1417379384323	Delete element
+1417379385823	Delete element
+1417380927416	Rename local variable 'mbitmap'
+1417380937910	Rename method 'setPic'
+1417382438703	Rename local variable 'photoLargeIntent'
+1417382446767	Rename local variable 'photoRecord'

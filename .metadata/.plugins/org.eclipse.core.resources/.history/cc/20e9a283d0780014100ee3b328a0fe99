@@ -1,0 +1,38 @@
+package com.coursera.dailyselfie;
+
+import android.graphics.Bitmap;
+
+public class SelfieRecord {
+
+	private String mSelfieTitle;
+	private Bitmap mSelfieBitmap;
+
+	public SelfieRecord(String mSelfieTitle) {
+		this.mSelfieTitle = mSelfieTitle;
+	}
+
+	public SelfieRecord() {
+	}
+
+	public String getmSelfieTitle() {
+		return mSelfieTitle;
+	}
+
+	public void setmSelfieTitle(String mSelfieTitle) {
+		this.mSelfieTitle = mSelfieTitle;
+	}
+
+	public Bitmap getmSelfieBitmap() {
+		return mSelfieBitmap;
+	}
+
+	public void setmSelfieBitmap(Bitmap mSelfieBitmap) {
+		this.mSelfieBitmap = mSelfieBitmap;
+	}
+
+	@Override
+	public String toString() {
+		return String.format("Selfie Title: %s", mSelfieTitle);
+
+	}
+}

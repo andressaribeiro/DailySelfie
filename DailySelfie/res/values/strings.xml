@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Daily Selfie</string>
-    <string name="hello_world">Hello world!</string>
     <string name="action_camera">Camera</string>
-	<string name="album_name">CameraSample</string>
+	<string name="album_name">Daily</string>
+	<string name="selfie_description">Selfie</string>
+	<string name="selfie_title"></string>
 </resources>

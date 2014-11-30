@@ -6,33 +6,51 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 import android.annotation.SuppressLint;
-import android.app.Activity;
+import android.app.ListActivity;
 import android.content.Intent;
-import android.graphics.BitmapFactory;
+import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Environment;
+import android.os.Parcelable;
 import android.provider.MediaStore;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ListAdapter;
 
-public class DailySelfieActivity extends Activity {
+public class DailySelfieActivity extends ListActivity {
 
 	private static final int TAKE_PHOTO_REQUEST_CODE = 1;
 
-	private String mCurrentPhotoPath;
+	private ListAdapter mAdapter;
 
 	private static final String JPEG_FILE_PREFIX = "IMG_";
 
 	private static final String JPEG_FILE_SUFFIX = ".jpg";
 
-	private static final String CAMERA_DIR = "/dcim/";
-
+	private static final String SELFIE_STORAGE = "/DCIM/Daily";
+	
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_daily_selfie);
+		
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                SelfieRecord selfieRecord = (SelfieRecord) mAdapter.getItem(position);
+                Bitmap bitmap = selfieRecord.getSelfieBitmap();
+
+                Intent intent = new Intent(DailySelfieActivity.this, SelfieImageActivity.class);
+                intent.putExtra("bitmap", (Parcelable) bitmap);
+
+                startActivity(intent);
+            }
+        });
+        
+		mAdapter = new SelfieViewAdapter(getApplicationContext());
+		setListAdapter(mAdapter);
 	}
 
 	private void startImageCaptureIntent() {
@@ -46,7 +64,6 @@ public class DailySelfieActivity extends Activity {
 		} catch (IOException e) {
 			e.printStackTrace();
 			file = null;
-			mCurrentPhotoPath = null;
 		}
 
 		startActivityForResult(intent, TAKE_PHOTO_REQUEST_CODE);
@@ -54,7 +71,6 @@ public class DailySelfieActivity extends Activity {
 
 	private File setUpPhotoFile() throws IOException {
 		File file = createImageFile();
-		mCurrentPhotoPath = file.getAbsolutePath();
 		return file;
 	}
 
@@ -62,7 +78,7 @@ public class DailySelfieActivity extends Activity {
 	private File createImageFile() throws IOException {
 		String timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
 		String imageFileName = JPEG_FILE_PREFIX + timeStamp + "_";
-		File albumFile = getAlbumDirectory();
+		File albumFile = new File(Environment.getExternalStorageDirectory() + SELFIE_STORAGE);
 		File imageFile = File.createTempFile(imageFileName, JPEG_FILE_SUFFIX, albumFile);
 		
 		return imageFile;
@@ -71,84 +87,9 @@ public class DailySelfieActivity extends Activity {
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		if (resultCode == RESULT_OK) {
-
-			if (mCurrentPhotoPath != null) {
-				setPicture();
-				addPictureToGallery();
-				mCurrentPhotoPath = null;
-			}
+			mAdapter = new SelfieViewAdapter(getApplicationContext());
+			setListAdapter(mAdapter);
 		}
-	}
-
-	private void setPicture() {
-
-		/* There isn't enough memory to open up more than a couple camera photos */
-		/* So pre-scale the target bitmap into which the file is decoded */
-
-		/* Get the size of the ImageView */
-		// int targetW = mImageView.getWidth();
-		// int targetH = mImageView.getHeight();
-
-		/* Get the size of the image */
-		BitmapFactory.Options bmOptions = new BitmapFactory.Options();
-		bmOptions.inJustDecodeBounds = true;
-		BitmapFactory.decodeFile(mCurrentPhotoPath, bmOptions);
-		// int photoW = bmOptions.outWidth;
-		// int photoH = bmOptions.outHeight;
-
-		/* Figure out which way needs to be reduced less */
-		int scaleFactor = 1;
-		// if ((targetW > 0) || (targetH > 0)) {
-		// scaleFactor = Math.min(photoW / targetW, photoH / targetH);
-		// }
-
-		/* Set bitmap options to scale the image decode target */
-		bmOptions.inJustDecodeBounds = false;
-		bmOptions.inSampleSize = scaleFactor;
-		bmOptions.inPurgeable = true;
-
-		/* Decode the JPEG file into a Bitmap */
-		// Bitmap bitmap = BitmapFactory.decodeFile(mCurrentPhotoPath,
-		// bmOptions);
-
-		/* Associate the Bitmap to the ImageView */
-		// mImageView.setImageBitmap(bitmap);
-		// mImageView.setVisibility(View.VISIBLE);
-	}
-
-	private void addPictureToGallery() {
-		Intent mediaScanIntent = new Intent("android.intent.action.MEDIA_SCANNER_SCAN_FILE");
-		File f = new File(mCurrentPhotoPath);
-		Uri contentUri = Uri.fromFile(f);
-		mediaScanIntent.setData(contentUri);
-		this.sendBroadcast(mediaScanIntent);
-	}
-
-	public File getStorageDirectory(String albumName) {
-		return new File(Environment.getExternalStorageDirectory() + CAMERA_DIR + albumName);
-	}
-
-	private File getAlbumDirectory() {
-		File storageDir = null;
-
-		if (Environment.MEDIA_MOUNTED.equals(Environment.getExternalStorageState())) {
-
-			storageDir = getStorageDirectory("Daily");
-
-			if (storageDir != null) {
-				if (!storageDir.mkdirs()) {
-					if (!storageDir.exists()) {
-						Log.d("CameraSample", "failed to create directory");
-						return null;
-					}
-				}
-			}
-
-		} else {
-			Log.v(getString(R.string.app_name), "External storage is not mounted READ/WRITE.");
-		}
-
-		return storageDir;
 	}
 
 	@Override

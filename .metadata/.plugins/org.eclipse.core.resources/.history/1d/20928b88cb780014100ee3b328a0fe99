@@ -1,0 +1,218 @@
+package com.coursera.dailyselfie;
+
+import android.app.AlarmManager;
+import android.app.ListActivity;
+import android.app.PendingIntent;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.net.Uri;
+import android.os.Bundle;
+import android.os.Environment;
+import android.os.Parcelable;
+import android.provider.MediaStore;
+import android.util.Log;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
+
+import java.io.File;
+import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
+
+public class MainActivity extends ListActivity {
+
+    private static final String TAG = "Daily Selfie";
+
+    static final int REQUEST_IMAGE_CAPTURE = 1;
+
+    PhotosListAdapter mAdapter;
+    String mCurrentPhotoPath;
+    String mFileName;
+    File photoFile;
+    String timeStamp;
+
+    static PendingIntent pendingIntent;
+    static AlarmManager alarmManager;
+
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+
+        getListView().setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                Log.i(TAG, "entered onItemClick");
+                PhotoRecord photoRecord = (PhotoRecord) mAdapter.getItem(position);
+                Bitmap bitmap = photoRecord.getmPhotoBitmap();
+
+                Intent photoLargeIntent = new Intent(MainActivity.this, PhotoActivity.class);
+                photoLargeIntent.putExtra("bitmap", (Parcelable) bitmap);
+                photoLargeIntent.putExtra("fileName", mFileName);
+
+                startActivity(photoLargeIntent);
+            }
+        });
+
+        Intent intentsOpen = new Intent(this, AlarmReceiver.class);
+        intentsOpen.setAction("murachandroidworkplace.takephoto.alarm.ACTION");
+        pendingIntent = PendingIntent.getBroadcast(this, 111, intentsOpen, 0);
+        alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        //fireAlarm();
+
+        mAdapter = new PhotosListAdapter(getApplicationContext());
+        mAdapter.addAllViews();
+        setListAdapter(mAdapter);
+    }
+
+
+
+    /*
+    Encodes the photo in the return Intent delivered to onActivityResult()
+    as a small Bitmap in the extras, under the key "data". The following code retrieves this image and displays
+    it in an ImageView.
+    */
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        Log.i(TAG, "entered onActivityResult");
+        if (requestCode == REQUEST_IMAGE_CAPTURE && resultCode == RESULT_OK) {
+            Log.i(TAG, "resultCode == RESULT_OK ");
+
+
+            galleryAddPic();
+            Bitmap imageBitmap = setPic();
+
+
+
+            PhotoRecord photoRecord = new PhotoRecord(imageBitmap,mCurrentPhotoPath,mFileName,timeStamp);
+
+            mAdapter.add(photoRecord);
+            Log.i(TAG, "exit onActivityResult");
+        }
+    }
+
+    /*
+    Invokes an intent to capture a photo
+     */
+    private void dispatchTakePictureIntent() {
+        Intent takePictureIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+        if (takePictureIntent.resolveActivity(getPackageManager()) != null) {
+
+            try {
+                photoFile = createImageFile();
+            } catch (IOException ex) {
+                // Error occurred while creating the File
+                Log.i(TAG, ex.getMessage());
+
+            }
+
+            // Continue only if the File was successfully created
+            if (photoFile != null) {
+                takePictureIntent.putExtra(MediaStore.EXTRA_OUTPUT,
+                        Uri.fromFile(photoFile));
+                startActivityForResult(takePictureIntent, REQUEST_IMAGE_CAPTURE);
+            }
+
+
+        }
+    }
+
+    private File createImageFile() throws IOException {
+        // Create an image file name
+        timeStamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
+        String imageFileName = "JPEG_" + timeStamp + "_";
+        File storageDir = Environment.getExternalStoragePublicDirectory(
+                Environment.DIRECTORY_PICTURES);
+
+
+        File image = new File(storageDir,imageFileName+".jpg");
+        //  storageDir.mkdirs();
+
+        // Save a file: path for use with ACTION_VIEW intents
+        mCurrentPhotoPath = "file:" + image.getAbsolutePath();
+        mFileName = image.getAbsolutePath();
+
+        return image;
+    }
+
+    private void galleryAddPic() {
+        Intent mediaScanIntent = new Intent(Intent.ACTION_MEDIA_SCANNER_SCAN_FILE);
+        File f = new File(mCurrentPhotoPath);
+        Uri contentUri = Uri.fromFile(f);
+        mediaScanIntent.setData(contentUri);
+        this.sendBroadcast(mediaScanIntent);
+    }
+
+    private Bitmap setPic(){
+
+
+
+        int scaleFactor = 5;
+        BitmapFactory.Options bmOptions = new BitmapFactory.Options();
+
+        // Decode the image file into a Bitmap sized to fill the View
+        bmOptions.inJustDecodeBounds = false;
+        bmOptions.inSampleSize = scaleFactor;
+        bmOptions.inPurgeable = true;
+
+        Bitmap bitmap = BitmapFactory.decodeFile(mFileName, bmOptions);
+
+
+        return bitmap;
+    }
+
+    public void fireAlarm() {
+        /**
+         * call broadcast receiver
+         */
+         final int TWO_MINUTES = 2 * 60 * 1000;
+
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, System.currentTimeMillis() + TWO_MINUTES, TWO_MINUTES, pendingIntent);
+
+
+    }
+
+    public void stopAlarm(){
+        alarmManager.cancel(pendingIntent);
+
+
+
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+
+        int id = item.getItemId();
+
+
+        if (id == R.id.action_camera) {
+            Log.i(TAG, "camera's icon pressed");
+            dispatchTakePictureIntent();
+            return true;
+        }
+
+        if(id == R.id.stop_alarm){
+            stopAlarm();
+        }
+
+        if(id == R.id.start_alarm){
+            fireAlarm();
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+}

@@ -1,0 +1,29 @@
+package com.coursera.dailyselfie;
+
+import android.graphics.Bitmap;
+import android.location.Location;
+
+public class SelfieRecord {
+	
+	private String mSelfieTitle;
+	private Bitmap mFlagBitmap;
+
+	public SelfieRecord(String flagUrl, String country, String place) {
+		this.mFlagUrl = flagUrl;
+		this.mCountryName = country;
+		this.mPlaceName = place;
+	}
+
+	public SelfieRecord(Location location) {
+		mLocation = location;
+	}
+
+	public SelfieRecord() {	
+	}
+
+	@Override
+	public String toString(){
+		return "Place: " + mPlaceName + " Country: " + mCountryName;
+		
+	}
+}
