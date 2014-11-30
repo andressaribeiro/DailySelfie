@@ -1,0 +1,9 @@
+1417293713700	Delete element
+1417293740489	Delete element
+1417293773117	Delete element
+1417293794003	Rename method 'getAlbumStorageDir'
+1417293922667	Rename method 'getAlbumDir'
+1417294316531	Rename field 'ACTION_TAKE_PHOTO_B'
+1417294403546	Rename field 'ACTION_TAKE_PHOTO'
+1417294437513	Rename local variable 'f'
+1417294581649	Rename local variable 'picBtn'

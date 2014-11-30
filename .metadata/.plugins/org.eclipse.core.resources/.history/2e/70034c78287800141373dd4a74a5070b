@@ -1,0 +1,13 @@
+import java.util.Random;
+
+
+public class SortearNumeros {
+	
+	public static void main(String[] args) {
+		Random r = new Random();
+		Integer i = r.nextInt(0);
+		
+		System.out.println(i);
+	}
+
+}

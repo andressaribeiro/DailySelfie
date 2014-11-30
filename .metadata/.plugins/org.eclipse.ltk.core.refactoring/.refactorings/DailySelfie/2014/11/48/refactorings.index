@@ -1,0 +1,16 @@
+1417295139550	Rename method 'initializeCamera'
+1417296001081	Rename method 'callCameraIntent'
+1417296210103	Rename method 'setPic'
+1417296237966	Rename local variable 'f'
+1417296270776	Rename method 'galleryAddPic'
+1417299242267	Rename method 'galleryAddPic'
+1417299258281	Rename method 'dispatchTakePictureIntent'
+1417299279282	Rename method 'takePictureIntent'
+1417299287848	Rename local variable 'takePictureIntent'
+1417299310480	Rename method 'setPic'
+1417310786403	Rename local variable 'albumF'
+1417310790100	Rename local variable 'albumFie'
+1417310797401	Rename local variable 'imageF'
+1417311052581	Rename method 'getAlbumStorageDirectory'
+1417369178105	Delete elements
+1417369671139	Delete element

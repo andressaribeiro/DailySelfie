@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Move element &apos;SortearNumeros.java&apos; to &apos;MegaSena/src/br.com.andressa&apos;&#x0D;&#x0A;- Original project: &apos;MegaSena&apos;&#x0D;&#x0A;- Destination element: &apos;MegaSena/src/br.com.andressa&apos;&#x0D;&#x0A;- Original element: &apos;SortearNumeros.java&apos;&#x0D;&#x0A;- Update references to refactored element" description="Move compilation unit" destination="/src&lt;br.com.andressa" element1="/src&lt;{SortearNumeros.java" files="0" flags="589830" folders="0" id="org.eclipse.jdt.ui.move" policy="org.eclipse.jdt.ui.moveResources" qualified="false" references="true" stamp="1417308092088" units="1" version="1.0"/>
+</session>
